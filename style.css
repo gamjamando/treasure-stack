@@ -258,6 +258,7 @@ html, body {
 }
 .pop-score { color: #10B981; }
 .pop-score-fire { color: #EF4444; font-size: 2.8rem; text-shadow: 0 0 10px #F59E0B; }
+.pop-clean { color: #22D3EE; font-size: 2rem; text-shadow: 0 0 12px #0891B2, 0 0 22px #FACC15; }
 .pop-time { color: #3B82F6; }
 .pop-fail { color: #DC2626; }
 

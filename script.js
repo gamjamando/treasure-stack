@@ -9,6 +9,12 @@ const FEVER_STACK_SIZE = 6;
 const FEVER_GAUGE_BASE = 120;
 const WRONG_SCORE_PENALTY = 200;
 const CHALLENGE_GRACE_SECONDS = 10;
+const CHALLENGE_START_STACK = 8;
+const CHALLENGE_MIN_STACK = 5;
+const CHALLENGE_FEVER_RESCUE_STACK = 3;
+const CHALLENGE_CLEAN_BONUS_STACK_LIMIT = 5;
+const CHALLENGE_CLEAN_BONUS_COMBO_STEP = 10;
+const CHALLENGE_CLEAN_BONUS_SCORE = 500;
 const CHALLENGE_START_DROP_INTERVAL = 4.0;
 const CHALLENGE_MIN_DROP_INTERVAL = 0.9;
 const CHALLENGE_SPEEDUP_RATE = 0.97;
@@ -395,6 +401,18 @@ function showImpactBurst(activeNode, itemType, isCorrect) {
     setTimeout(() => burst.remove(), 420);
 }
 
+function maybeAwardCleanBonus(activeNode) {
+    if (state.currentGameMode !== "CHALLENGE" || state.isFever) return;
+    if (state.combo === 0 || state.combo % CHALLENGE_CLEAN_BONUS_COMBO_STEP !== 0) return;
+
+    const resolvedStackCount = Math.max(0, state.stack.length - 1);
+    if (resolvedStackCount > CHALLENGE_CLEAN_BONUS_STACK_LIMIT) return;
+
+    state.score += CHALLENGE_CLEAN_BONUS_SCORE;
+    showFloatingText(activeNode, `CLEAN BONUS +${CHALLENGE_CLEAN_BONUS_SCORE}`, "pop-clean");
+    restartAnimation(els.score, "fever-ui-pulse");
+}
+
 function triggerFeverIntro() {
     const feverPop = document.createElement("div");
     feverPop.className = "fever-pop";
@@ -455,7 +473,7 @@ function startGame(mode) {
     const oldBoard = document.getElementById("arcade-board");
     if (oldBoard) oldBoard.remove();
 
-    for (let i = 0; i < 8; i++) pushNewItem();
+    fillStackToSize(CHALLENGE_START_STACK);
 
     renderStack();
     updateFeverGauge();
@@ -481,6 +499,10 @@ function pushNewItem() {
     }
 
     state.stack.push(type);
+}
+
+function fillStackToSize(targetSize) {
+    while (state.stack.length < targetSize) pushNewItem();
 }
 
 function updateFeverGauge() {
@@ -667,7 +689,7 @@ function processInput(direction) {
                 state.feverGauge = 0;
                 els.gameScreen.className = "relative flex-1 w-full h-[100dvh] flex flex-col items-center pt-2 transition-transform bg-fever shadow-inner overflow-hidden screen";
                 state.stack = [];
-                for (let i = 0; i < FEVER_STACK_SIZE; i++) pushNewItem();
+                fillStackToSize(state.currentGameMode === "CHALLENGE" ? CHALLENGE_FEVER_RESCUE_STACK : FEVER_STACK_SIZE);
                 triggerFeverIntro();
                 triggeredFever = true;
             }
@@ -687,7 +709,11 @@ function processInput(direction) {
         }
 
         state.stack.shift();
-        if (state.currentGameMode === "CLASSIC" || wasFeverInput || state.stack.length === 0) {
+        if (state.currentGameMode === "CLASSIC" || wasFeverInput) {
+            pushNewItem();
+        } else if (state.currentGameMode === "CHALLENGE") {
+            fillStackToSize(CHALLENGE_MIN_STACK);
+        } else if (state.stack.length === 0) {
             pushNewItem();
         }
         isResolvingInput = false;
@@ -713,6 +739,7 @@ function handleCorrectInput(itemType, activeNode) {
 
     state.combo++;
     if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+    maybeAwardCleanBonus(activeNode);
     updateComboText();
 }
 
