@@ -37,13 +37,13 @@ const DEFAULT_BELT_BUMP = 13;
 const ACHIEVEMENT_STORAGE_KEY = "ts_achievements";
 
 const achievementDefinitions = {
-    first_play: { title: "첫 플레이" },
-    score_100k: { title: "10만점 달성" },
-    score_300k: { title: "30만점 달성" },
-    first_full_combo: { title: "FULL COMBO" },
-    combo_100: { title: "100콤보 달성" },
-    first_fever: { title: "첫 피버 진입" },
-    challenge_1min: { title: "챌린지 1분 생존" }
+    first_play: { title: "첫 플레이", description: "아무 모드나 처음 시작하기" },
+    score_100k: { title: "10만점 달성", description: "한 판에서 100,000점 달성" },
+    score_300k: { title: "30만점 달성", description: "한 판에서 300,000점 달성" },
+    first_full_combo: { title: "FULL COMBO", description: "콤보를 한 번도 끊기지 않고 한 판 완료" },
+    combo_100: { title: "100콤보 달성", description: "한 판에서 100콤보 달성" },
+    first_fever: { title: "첫 피버 진입", description: "피버 타임을 처음 발동" },
+    challenge_1min: { title: "챌린지 1분 생존", description: "챌린지 모드에서 1분 생존" }
 };
 
 let achievementData = loadAchievementData();
@@ -147,6 +147,9 @@ const els = {
     btnResultHome: document.getElementById("btn-result-home"),
     btnGameMenu: document.getElementById("btn-game-menu"),
     achievementButton: document.getElementById("achievement-button"),
+    achievementPanel: document.getElementById("achievement-panel"),
+    achievementClose: document.getElementById("achievement-close"),
+    achievementList: document.getElementById("achievement-list"),
     achievementToast: document.getElementById("achievement-toast"),
     achievementToastTitle: document.getElementById("achievement-toast-title"),
 gameMenuModal: document.getElementById("game-menu-modal"),
@@ -386,6 +389,55 @@ function updateAchievementButton() {
     els.achievementButton.textContent = `👑 ${unlocked} / ${total}`;
 }
 
+function renderAchievementList() {
+    if (!els.achievementList) return;
+
+    els.achievementList.innerHTML = "";
+
+    Object.entries(achievementDefinitions).forEach(([id, achievement]) => {
+        const unlocked = !!achievementData.unlocked[id];
+        const row = document.createElement("div");
+        row.className = `achievement-row ${unlocked ? "achievement-row-unlocked" : "achievement-row-locked"}`;
+
+        const crown = document.createElement("div");
+        crown.className = "achievement-crown";
+        crown.textContent = "👑";
+
+        const copy = document.createElement("div");
+        copy.className = "achievement-copy";
+
+        const title = document.createElement("strong");
+        title.textContent = achievement.title;
+
+        const description = document.createElement("span");
+        description.textContent = achievement.description;
+
+        const state = document.createElement("div");
+        state.className = "achievement-state";
+        state.textContent = unlocked ? "달성" : "미달성";
+
+        copy.appendChild(title);
+        copy.appendChild(description);
+        row.appendChild(crown);
+        row.appendChild(copy);
+        row.appendChild(state);
+        els.achievementList.appendChild(row);
+    });
+}
+
+function openAchievementPanel() {
+    if (!els.achievementPanel) return;
+
+    renderAchievementList();
+    els.achievementPanel.classList.remove("hidden");
+}
+
+function closeAchievementPanel() {
+    if (!els.achievementPanel) return;
+
+    els.achievementPanel.classList.add("hidden");
+}
+
 function showAchievementToast(title) {
     if (!els.achievementToast || !els.achievementToastTitle) return;
 
@@ -409,6 +461,7 @@ function unlockAchievement(id) {
     achievementData.unlocked[id] = true;
     saveAchievementData();
     updateAchievementButton();
+    renderAchievementList();
     showAchievementToast(achievementDefinitions[id].title);
     return true;
 }
@@ -1131,6 +1184,14 @@ function closeRankingPage() {
 els.btnClassic.addEventListener("pointerdown", () => startGame("CLASSIC"));
 els.btnChallenge.addEventListener("pointerdown", () => startGame("CHALLENGE"));
 updateAchievementButton();
+els.achievementButton.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    openAchievementPanel();
+});
+els.achievementClose.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    closeAchievementPanel();
+});
 els.btnAgain.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     startGame(state.currentGameMode);
