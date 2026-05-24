@@ -39,6 +39,61 @@ html, body {
 }
 
 /* 기본 상태 화이트 배경 */
+.challenge-status {
+    position: relative;
+    z-index: 20;
+    margin-top: 0.25rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.08);
+    color: #64748b;
+    font-size: 0.68rem;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: 0.12em;
+}
+
+.challenge-status-busy {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+}
+
+.challenge-status-danger {
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+}
+
+.challenge-status-overload {
+    background: rgba(239, 68, 68, 0.16);
+    color: #dc2626;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+.ready-prompt {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    z-index: 80;
+    width: min(82vw, 340px);
+    transform: translate(-50%, -50%);
+    padding: 0.7rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.78);
+    color: #f8fafc;
+    font-size: 0.82rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-align: center;
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.25);
+    animation: readyPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes readyPulse {
+    0% { opacity: 0.72; transform: translate(-50%, -50%) scale(0.98); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
 .bg-normal {
     background-color: #ffffff !important;
     background: #ffffff !important;

@@ -94,6 +94,8 @@ const els = {
     score: document.getElementById("hud-score"),
     combo: document.getElementById("hud-combo"),
     best: document.getElementById("hud-best"),
+    challengeStatus: document.getElementById("challenge-status"),
+    readyPrompt: document.getElementById("ready-prompt"),
     warning: document.getElementById("overload-warning"),
     stack: document.getElementById("item-stack"),
     rail: document.getElementById("track"),
@@ -387,6 +389,28 @@ function updateComboText() {
     els.combo.classList.toggle("combo-crazy", state.combo >= 20);
 }
 
+function updateReadyPrompt() {
+    if (!els.readyPrompt) return;
+    els.readyPrompt.classList.toggle("hidden", state.hasStartedInput || state.isGameOver);
+}
+
+function updateChallengeStatus(count = state.stack.length) {
+    if (!els.challengeStatus) return;
+
+    if (state.currentGameMode !== "CHALLENGE" || state.isGameOver) {
+        els.challengeStatus.classList.add("hidden");
+        return;
+    }
+
+    let label = "CALM";
+    if (count >= 18) label = "OVERLOAD";
+    else if (count >= 14) label = "DANGER";
+    else if (count >= 8) label = "BUSY";
+
+    els.challengeStatus.textContent = label;
+    els.challengeStatus.className = `challenge-status challenge-status-${label.toLowerCase()}`;
+}
+
 function getResultGrade(score, maxCombo) {
     if (score >= 30000 || maxCombo >= 80) return "SS";
     if (score >= 20000 || maxCombo >= 50) return "S";
@@ -501,6 +525,8 @@ function startGame(mode) {
         els.hearts.classList.remove("hidden");
         renderLives();
     }
+    updateReadyPrompt();
+    updateChallengeStatus(0);
 
     setFeverBackground(false);
     clearFeverEffects();
@@ -572,6 +598,7 @@ function renderStack() {
     });
 
     const count = state.stack.length;
+    updateChallengeStatus(count);
     els.gameScreen.classList.remove("shake-low", "shake-medium");
     els.warning.classList.add("hidden");
 
@@ -707,6 +734,7 @@ function processInput(direction) {
     if (!state.hasStartedInput) {
         state.hasStartedInput = true;
         lastUpdateTime = performance.now();
+        updateReadyPrompt();
     }
 
     isResolvingInput = true;
@@ -926,6 +954,8 @@ async function checkRankingRegistration() {
 function endGame(reason) {
     state.isPlaying = false;
     state.isGameOver = true;
+    updateReadyPrompt();
+    updateChallengeStatus();
 
     if (loopFrameId) cancelAnimationFrame(loopFrameId);
 
@@ -996,6 +1026,8 @@ function quitToMenu() {
     els.resultScreen.classList.add("hidden");
     els.rankingScreen.classList.add("hidden");
     els.startScreen.classList.remove("hidden");
+    updateReadyPrompt();
+    updateChallengeStatus();
 
     clearFeverEffects();
 

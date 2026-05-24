@@ -43,6 +43,7 @@
         </div>
 
         <div class="text-xs text-slate-400 font-bold mt-1 z-20">BEST: <span id="hud-best">0</span></div>
+        <div id="challenge-status" class="challenge-status hidden">CALM</div>
 
         <div class="w-11/12 h-3.5 bg-slate-200 rounded-full mt-2 border border-slate-300 overflow-hidden z-20 shadow-inner" id="fever-gap">
             <div id="fever-bar" class="h-full bg-gradient-to-r from-emerald-400 to-blue-500 transition-all duration-100" style="width: 0%;"></div>
@@ -51,6 +52,7 @@
         <div id="overload-warning" class="text-rose-600 font-black text-xl mt-1 opacity-0 transition-opacity z-20 hidden animate-pulse">⚠️ 레일 오버로드 위험! 빨리 처리하세요! ⚠️</div>
 
         <div id="track" class="relative w-full flex-1 z-10 pointer-events-none mt-2 mb-4">
+            <div id="ready-prompt" class="ready-prompt hidden">TAP LEFT / RIGHT TO START</div>
 
             <!-- 컨베이어 벨트 -->
             <div id="belt-area">
