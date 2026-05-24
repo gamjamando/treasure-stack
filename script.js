@@ -38,12 +38,65 @@ const ACHIEVEMENT_STORAGE_KEY = "ts_achievements";
 
 const achievementDefinitions = {
     first_play: { title: "첫 플레이", description: "아무 모드나 처음 시작하기" },
-    score_100k: { title: "10만점 달성", description: "한 판에서 100,000점 달성" },
-    score_300k: { title: "30만점 달성", description: "한 판에서 300,000점 달성" },
-    first_full_combo: { title: "FULL COMBO", description: "콤보를 한 번도 끊기지 않고 한 판 완료" },
-    combo_100: { title: "100콤보 달성", description: "한 판에서 100콤보 달성" },
-    first_fever: { title: "첫 피버 진입", description: "피버 타임을 처음 발동" },
-    challenge_1min: { title: "챌린지 1분 생존", description: "챌린지 모드에서 1분 생존" }
+
+    score_100k: { title: "손풀기 완료", description: "한 판에서 100,000점 달성" },
+    score_300k: { title: "컨베이어 적응자", description: "한 판에서 300,000점 달성" },
+    score_500k: { title: "황금 감각", description: "한 판에서 500,000점 달성" },
+    score_1m: { title: "레일의 지배자", description: "한 판에서 1,000,000점 달성" },
+
+    combo_10: { title: "흐름 탄다", description: "10콤보 달성" },
+    combo_50: { title: "손이 멈추지 않는다", description: "50콤보 달성" },
+    combo_100: { title: "리듬 머신", description: "100콤보 달성" },
+    combo_200: { title: "과몰입 시작", description: "200콤보 달성" },
+    combo_300: { title: "컨베이어와 하나가 됨", description: "300콤보 달성" },
+
+    full_combo_1: { title: "완벽주의자", description: "FULL COMBO 최초 달성" },
+    full_combo_3: { title: "실수 없는 손놀림", description: "FULL COMBO 3회 달성" },
+    full_combo_5: { title: "이미 몸이 기억한다", description: "FULL COMBO 5회 달성" },
+    full_combo_10: { title: "GAME MASTER", description: "FULL COMBO 10회 달성" },
+    full_combo_30: { title: "틀리지 않는 손가락", description: "FULL COMBO 30회 달성" },
+
+    first_fever: { title: "과열 상태", description: "피버 타임을 처음 발동" },
+    fever_3: { title: "GOLD RUSH", description: "피버 3회 달성" },
+    fever_100: { title: "피버광", description: "피버 100회 달성" },
+    fever_combo_100: { title: "멈출 수 없어", description: "피버 상태에서 100콤보 유지" },
+
+    challenge_1min: { title: "살아남았다", description: "챌린지 모드에서 1분 생존" },
+    challenge_3min: { title: "아직 안 끝났다", description: "챌린지 모드에서 3분 생존" },
+    challenge_5min: { title: "인간 컨베이어", description: "챌린지 모드에서 5분 생존" },
+    clean_stack: { title: "정리의 신", description: "스택을 완전히 비우기" },
+    overload_escape: { title: "OVERLOAD 탈출", description: "위험 상태에서 회복 성공" },
+
+    bomb_5: { title: "제 성격이 너무 급합니다", description: "폭탄 5회 획득" },
+    bomb_chain_3: { title: "그래서 자꾸 폭탄을 챙겨요", description: "폭탄 연속 3회 획득" },
+    bomb_20: { title: "폭탄 수집가", description: "폭탄 20회 획득" },
+    bomb_only_3: { title: "이걸 왜 먹음?", description: "폭탄만 3개 연속 획득" },
+
+    miss_5: { title: "손이 미끄러졌어요", description: "연속 오답 5회" },
+    greedy_fail: { title: "욕심쟁이", description: "폭탄 직전 코인을 챙기다 실패" },
+    lucky_diamond: { title: "운도 실력이다", description: "다이아만 연속 획득" },
+    same_input: { title: "아니 왜 거길 눌러", description: "같은 방향만 연속 입력" },
+
+    play_10: { title: "컨베이어 입문자", description: "10판 플레이" },
+    play_50: { title: "출근 완료", description: "50판 플레이" },
+    play_100: { title: "퇴근 안 함", description: "100판 플레이" },
+    play_300: { title: "컨베이어 중독", description: "300판 플레이" },
+
+    coal_only_10: { title: "광부 지망생", description: "석탄만 10회 획득" },
+    coal_only_30: { title: "탄광의 지배자", description: "석탄만 30회 획득" },
+    diamond_only_10: { title: "괴도 지망생", description: "보석만 10회 획득" },
+    diamond_only_30: { title: "보석 사냥꾼", description: "보석만 30회 획득" },
+    coin_only_10: { title: "현금만물주의자", description: "코인만 10회 획득" },
+    coin_only_30: { title: "돈의 노예", description: "코인만 30회 획득" },
+    hourglass_only_10: { title: "시간을 지배하는 자", description: "모래시계만 10회 획득" },
+    hourglass_only_30: { title: "시간 여행자", description: "모래시계만 30회 획득" },
+    bomb_collect_10: { title: "예비 폭탄광", description: "폭탄 '챙기기' 10회" },
+    bomb_collect_30: { title: "폭탄 애호가", description: "폭탄 '챙기기' 30회" },
+
+    trash_master: { title: "쓰레기 수집가", description: "석탄만 연속 획득" },
+    greed_mode: { title: "욕심 ON", description: "아이템을 쉬지 않고 획득" },
+    panic_clicker: { title: "패닉 상태", description: "1초 내 연속 입력" },
+    coin_addict: { title: "동전 중독", description: "코인 총 100개 획득" }
 };
 
 let achievementData = loadAchievementData();
