@@ -15,6 +15,7 @@ const CHALLENGE_FEVER_RESCUE_STACK = 3;
 const CHALLENGE_CLEAN_BONUS_STACK_LIMIT = 5;
 const CHALLENGE_CLEAN_BONUS_COMBO_STEP = 10;
 const CHALLENGE_CLEAN_BONUS_SCORE = 500;
+const CHALLENGE_RECOVERY_BONUS_SCORE = 1200;
 const CHALLENGE_START_DROP_INTERVAL = 4.0;
 const CHALLENGE_MIN_DROP_INTERVAL = 0.9;
 const CHALLENGE_SPEEDUP_RATE = 0.97;
@@ -57,6 +58,7 @@ let breakingHeartIndex = null;
 let breakingHeartTimer = null;
 let screenShakeTimer = null;
 let overloadWarningStage = "NONE";
+let overloadEscapeArmed = false;
 
 let bestScoreClassic = parseInt(localStorage.getItem("ts_classic_best")) || 0;
 let bestScoreChallenge = parseInt(localStorage.getItem("ts_challenge_best")) || 0;
@@ -413,6 +415,31 @@ function maybeAwardCleanBonus(activeNode) {
     restartAnimation(els.score, "fever-ui-pulse");
 }
 
+function showArcadeReward(title, subtitle) {
+    const reward = document.createElement("div");
+    reward.className = "arcade-reward-pop";
+    reward.innerHTML = `<span>${title}</span><small>${subtitle}</small>`;
+    els.floatLayer.appendChild(reward);
+    restartAnimation(els.score, "fever-ui-pulse");
+    restartAnimation(els.rail, "recovery-glow");
+    setTimeout(() => reward.remove(), 800);
+}
+
+function maybeAwardOverloadEscape(stackCount) {
+    if (state.currentGameMode !== "CHALLENGE") return;
+
+    if (stackCount >= OVERLOAD_WARN_HIGH) {
+        overloadEscapeArmed = true;
+        return;
+    }
+
+    if (!overloadEscapeArmed || stackCount >= OVERLOAD_WARN_LOW) return;
+
+    overloadEscapeArmed = false;
+    state.score += CHALLENGE_RECOVERY_BONUS_SCORE;
+    showArcadeReward("OVERLOAD ESCAPE", `CLEAN RECOVERY +${CHALLENGE_RECOVERY_BONUS_SCORE}`);
+}
+
 function triggerFeverIntro() {
     const feverPop = document.createElement("div");
     feverPop.className = "fever-pop";
@@ -440,6 +467,7 @@ function startGame(mode) {
     clearBreakingHeart();
     updateComboText();
     overloadWarningStage = "NONE";
+    overloadEscapeArmed = false;
 
     itemDropTimer = 0;
     currentDropInterval = CHALLENGE_START_DROP_INTERVAL;
@@ -558,8 +586,10 @@ function renderStack() {
             triggerScreenShake(nextOverloadStage === "HIGH" ? 1.5 : 1, 110);
         }
         overloadWarningStage = nextOverloadStage;
+        maybeAwardOverloadEscape(count);
     } else {
         overloadWarningStage = "NONE";
+        overloadEscapeArmed = false;
     }
 
     updateFeverGauge();
