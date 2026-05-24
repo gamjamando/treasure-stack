@@ -442,6 +442,24 @@ function restartAnimation(node, className) {
     node.classList.add(className);
 }
 
+function lockGameViewport() {
+    const viewportHeight = Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
+    if (viewportHeight > 0) {
+        document.documentElement.style.setProperty("--game-height", `${viewportHeight}px`);
+    }
+    document.body.classList.add("game-viewport-locked");
+}
+
+function unlockGameViewport() {
+    document.body.classList.remove("game-viewport-locked");
+    document.documentElement.style.setProperty("--game-height", "100dvh");
+}
+
+function preventGameTouchScroll(e) {
+    if (!els.gameScreen || els.gameScreen.classList.contains("hidden")) return;
+    e.preventDefault();
+}
+
 function setFeverBackground(isFever) {
     els.gameScreen.classList.toggle("bg-fever", isFever);
     els.gameScreen.classList.toggle("bg-white", !isFever);
@@ -676,6 +694,7 @@ function triggerFeverIntro() {
 }
 
 function startGame(mode) {
+    lockGameViewport();
     unlockAchievement("first_play");
     state.currentGameMode = mode;
     state.currentTimer = START_TIMER;
@@ -1159,6 +1178,7 @@ function endGame(reason) {
 
     els.gameScreen.classList.add("hidden");
     els.resultScreen.classList.remove("hidden");
+    unlockGameViewport();
     els.btnAgain.disabled = true;
     els.btnAgain.style.pointerEvents = "none";
 
@@ -1211,6 +1231,7 @@ function backToMenu() {
     els.gameScreen.classList.add("hidden");
     els.resultScreen.classList.add("hidden");
     els.startScreen.classList.remove("hidden");
+    unlockGameViewport();
 }
 function quitToMenu() {
     state.isGameOver = true;
@@ -1228,6 +1249,7 @@ function quitToMenu() {
     els.resultScreen.classList.add("hidden");
     els.rankingScreen.classList.add("hidden");
     els.startScreen.classList.remove("hidden");
+    unlockGameViewport();
     updateReadyPrompt();
     updateChallengeStatus();
 
@@ -1299,6 +1321,9 @@ els.btnRight.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     processInput("R");
 });
+
+document.addEventListener("touchmove", preventGameTouchScroll, { passive: false });
+document.addEventListener("gesturestart", preventGameTouchScroll, { passive: false });
 
 document.addEventListener("keydown", (e) => {
     if (state.isGameOver || els.gameScreen.classList.contains("hidden")) return;

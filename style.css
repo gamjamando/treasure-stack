@@ -2,12 +2,32 @@
    Treasure Stack - 애니메이션 및 비주얼 이펙트
    ========================================== */
 
-   body {
+:root {
+    --game-height: 100dvh;
+}
+
+html {
+    height: var(--game-height);
+    min-height: var(--game-height);
+    max-height: var(--game-height);
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+}
+
+body {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: var(--game-height);
+    min-height: var(--game-height);
+    max-height: var(--game-height);
+    overflow: hidden;
+    overscroll-behavior: none;
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
-    overflow: hidden;
-    background-color: #111827; 
+    background-color: #111827;
 }
 
 /* ==========================================================================
@@ -17,17 +37,33 @@ html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100dvh !important; 
+    height: var(--game-height) !important;
     overflow: hidden;
-    touch-action: manipulation;
+    overscroll-behavior: none;
+    touch-action: none;
 }
 
 .hidden {
     display: none !important;
 }
 
-.screen {
-    height: 100dvh !important;
+.screen,
+#game-screen {
+    height: var(--game-height) !important;
+    min-height: var(--game-height) !important;
+    max-height: var(--game-height) !important;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+}
+
+#btn-left,
+#btn-right {
+    overscroll-behavior: none;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 #start-screen {
@@ -704,7 +740,7 @@ html, body {
 
 .belt {
     width: 24vw;
-    height: 140vh;
+    height: 140%;
 
     background-image: url("Assets/Background/belt.png");
     background-repeat: repeat-y;
