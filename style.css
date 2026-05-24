@@ -590,3 +590,26 @@ html, body {
     color: #f59e0b;
     text-shadow: 0 0 16px rgba(245, 158, 11, 0.65), 0 0 28px rgba(34, 211, 238, 0.35);
 }
+
+.full-combo-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #fef3c7, #facc15);
+    color: #78350f;
+    font-size: 0.9rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    box-shadow: 0 0 16px rgba(250, 204, 21, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+    animation: fullComboPulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes fullComboPulse {
+    0% { transform: scale(0.98); filter: brightness(1); }
+    100% { transform: scale(1.04); filter: brightness(1.12); }
+}

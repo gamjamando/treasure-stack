@@ -40,6 +40,7 @@ let state = {
     currentTimer: START_TIMER,
     score: 0,
     combo: 0,
+    comboBreakCount: 0,
     maxCombo: 0,
     survivedTime: 0,
     isFever: false,
@@ -106,6 +107,7 @@ const els = {
     resTime: document.getElementById("res-time"),
     resCombo: document.getElementById("res-combo"),
     resGrade: document.getElementById("res-grade"),
+    resFullCombo: document.getElementById("res-full-combo"),
     feverBar: document.getElementById("fever-bar"),
     flash: document.getElementById("fever-flash"),
     btnLeft: document.getElementById("btn-left"),
@@ -488,6 +490,7 @@ function startGame(mode) {
     state.currentTimer = START_TIMER;
     state.score = 0;
     state.combo = 0;
+    state.comboBreakCount = 0;
     state.maxCombo = 0;
     state.survivedTime = 0;
     state.isFever = false;
@@ -824,6 +827,7 @@ function handleCorrectInput(itemType, activeNode) {
 
 function handleWrongInput(itemType, activeNode) {
     playTone("bomb");
+    state.comboBreakCount++;
     state.combo = 0;
     if (!state.isFever) {
         state.feverGauge = Math.max(
@@ -995,6 +999,9 @@ setTimeout(() => {
         const grade = getResultGrade(state.score, state.maxCombo);
         els.resGrade.innerText = grade;
         els.resGrade.className = `result-grade result-grade-${grade.toLowerCase()}`;
+    }
+    if (els.resFullCombo) {
+        els.resFullCombo.classList.toggle("hidden", state.comboBreakCount !== 0);
     }
 
     const min = Math.floor(state.survivedTime / 60).toString().padStart(2, "0");
