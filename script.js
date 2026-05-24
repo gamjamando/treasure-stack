@@ -405,7 +405,7 @@ function updateFeverGauge() {
 function renderStack() {
     els.stack.innerHTML = "";
 
-    state.stack.slice(0, 6).forEach((type, idx) => {
+    state.stack.slice(0, 8).forEach((type, idx) => {
         const node = document.createElement("div");
         node.className = `stack-item pos-${idx} flex items-center justify-center origin-center`;
         node.id = idx === 0 ? "active-item" : "";
