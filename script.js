@@ -11,7 +11,9 @@ const WRONG_SCORE_PENALTY = 200;
 const CHALLENGE_GRACE_SECONDS = 10;
 const CHALLENGE_START_STACK = 8;
 const CHALLENGE_MIN_STACK = 5;
-const CHALLENGE_FEVER_RESCUE_STACK = 3;
+const CHALLENGE_FEVER_STACK_SIZE = 8;
+const CHALLENGE_RECOVERY_ARM_STACK = 12;
+const CHALLENGE_RECOVERY_CLEAR_STACK = 5;
 const CHALLENGE_CLEAN_BONUS_STACK_LIMIT = 5;
 const CHALLENGE_CLEAN_BONUS_COMBO_STEP = 10;
 const CHALLENGE_CLEAN_BONUS_SCORE = 500;
@@ -291,6 +293,7 @@ function clearFeverEffects() {
     els.btnRight.classList.remove("btn-fever-warning");
     els.gameScreen.classList.remove("screen-shake");
     els.rail.classList.remove("fever-hit");
+    setFeverBackground(false);
 }
 
 function clearBreakingHeart() {
@@ -335,6 +338,11 @@ function restartAnimation(node, className) {
     node.classList.remove(className);
     void node.offsetWidth;
     node.classList.add(className);
+}
+
+function setFeverBackground(isFever) {
+    els.gameScreen.classList.toggle("bg-fever", isFever);
+    els.gameScreen.classList.toggle("bg-white", !isFever);
 }
 
 function triggerScreenShake(intensity = 1, duration = 110) {
@@ -429,16 +437,16 @@ function showArcadeReward(title, subtitle) {
 function maybeAwardOverloadEscape(stackCount) {
     if (state.currentGameMode !== "CHALLENGE") return;
 
-    if (stackCount >= OVERLOAD_WARN_HIGH) {
+    if (stackCount >= CHALLENGE_RECOVERY_ARM_STACK) {
         overloadEscapeArmed = true;
         return;
     }
 
-    if (!overloadEscapeArmed || stackCount >= OVERLOAD_WARN_LOW) return;
+    if (!overloadEscapeArmed || stackCount > CHALLENGE_RECOVERY_CLEAR_STACK) return;
 
     overloadEscapeArmed = false;
     state.score += CHALLENGE_RECOVERY_BONUS_SCORE;
-    showArcadeReward("OVERLOAD ESCAPE", `CLEAN RECOVERY +${CHALLENGE_RECOVERY_BONUS_SCORE}`);
+    showArcadeReward("RECOVERY!", `CLEAN +${CHALLENGE_RECOVERY_BONUS_SCORE}`);
 }
 
 function triggerFeverIntro() {
@@ -494,7 +502,7 @@ function startGame(mode) {
         renderLives();
     }
 
-    els.gameScreen.className = "relative flex-1 w-full flex flex-col items-center pt-2 transition-transform bg-white shadow-inner overflow-hidden screen";
+    setFeverBackground(false);
     clearFeverEffects();
 
     const oldBox = document.getElementById("arcade-input-zone");
@@ -661,19 +669,19 @@ function updateFeverEffects(dt) {
             state.isFever = false;
             state.feverGauge = 0;
             state.maxFeverGauge += 40;
-            els.gameScreen.className = "relative flex-1 w-full flex flex-col items-center pt-2 transition-transform bg-white shadow-inner overflow-hidden screen";
+            setFeverBackground(false);
             clearFeverEffects();
             return;
         } else if (state.feverTimer <= 1.2) {
             targetFlashClass = "flash-warning-fast";
             shouldPulse = true;
-            els.gameScreen.className = "relative flex-1 w-full h-[100dvh] flex flex-col items-center pt-2 transition-transform bg-fever shadow-inner overflow-hidden screen";
+            setFeverBackground(true);
         } else if (state.feverTimer <= 3.0) {
             targetFlashClass = "flash-warning-slow";
             shouldPulse = true;
-            els.gameScreen.className = "relative flex-1 w-full h-[100dvh] flex flex-col items-center pt-2 transition-transform bg-fever shadow-inner overflow-hidden screen";
+            setFeverBackground(true);
         } else {
-            els.gameScreen.className = "relative flex-1 w-full h-[100dvh] flex flex-col items-center pt-2 transition-transform bg-fever shadow-inner overflow-hidden screen";
+            setFeverBackground(true);
         }
 
         if (els.flash.className !== targetFlashClass) els.flash.className = targetFlashClass;
@@ -730,9 +738,9 @@ function processInput(direction) {
                 state.isFever = true;
                 state.feverTimer = FEVER_DURATION;
                 state.feverGauge = 0;
-                els.gameScreen.className = "relative flex-1 w-full h-[100dvh] flex flex-col items-center pt-2 transition-transform bg-fever shadow-inner overflow-hidden screen";
+                setFeverBackground(true);
                 state.stack = [];
-                fillStackToSize(state.currentGameMode === "CHALLENGE" ? CHALLENGE_FEVER_RESCUE_STACK : FEVER_STACK_SIZE);
+                fillStackToSize(state.currentGameMode === "CHALLENGE" ? CHALLENGE_FEVER_STACK_SIZE : FEVER_STACK_SIZE);
                 triggerFeverIntro();
                 triggeredFever = true;
             }
