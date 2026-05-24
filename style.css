@@ -1,0 +1,345 @@
+/* ==========================================
+   Treasure Stack - 애니메이션 및 비주얼 이펙트
+   ========================================== */
+
+   body {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+    background-color: #111827; 
+}
+
+/* ==========================================================================
+   🚨 일반 인터넷 브라우저(삼성 인터넷, 크롬) 하단 버튼 잘림 가드
+   ========================================================================== */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100dvh !important; 
+    overflow: hidden;
+    touch-action: manipulation;
+}
+
+.screen {
+    height: 100dvh !important;
+}
+
+/* 기본 상태 화이트 배경 */
+.bg-normal {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+}
+
+/* 컨베이어 벨트 정렬 픽스 */
+.stack-item {
+    position: absolute;
+    width: 4.5rem;
+    height: 4.5rem;
+    font-size: 4.5rem; 
+    /* 🎯 transform 및 filter 복합 제어로 부드러운 정렬 보정 */
+    transition: transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.12s ease-out;
+    left: 50%;
+    transform-origin: center bottom;
+    text-shadow: 0 10px 15px rgba(0,0,0,0.5);
+    margin-left: -2.25rem; 
+    will-change: transform, filter, opacity;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================
+   아이템 원근 배치
+========================= */
+
+.pos-0 {
+    bottom: 4%;
+    transform: scale(1.2);
+    z-index: 60;
+    opacity: 1;
+}
+
+.pos-1 {
+    bottom: 16%;
+    transform: scale(1.05);
+    z-index: 50;
+    opacity: 1;
+}
+
+.pos-2 {
+    bottom: 28%;
+    transform: scale(0.92);
+    z-index: 40;
+    opacity: 1;
+}
+
+.pos-3 {
+    bottom: 40%;
+    transform: scale(0.80);
+    z-index: 30;
+    opacity: 1;
+}
+
+.pos-4 {
+    bottom: 52%;
+    transform: scale(0.68);
+    z-index: 20;
+    opacity: 1;
+}
+
+.pos-5 {
+    bottom: 63%;
+    transform: scale(0.56);
+    z-index: 15;
+    opacity: 0.95;
+}
+
+.pos-6 {
+    bottom: 73%;
+    transform: scale(0.46);
+    z-index: 10;
+    opacity: 0.9;
+}
+
+.pos-7 {
+    bottom: 82%;
+    transform: scale(0.38);
+    z-index: 5;
+    opacity: 0.85;
+}
+
+/* 도트 그래픽 보정 */
+.stack-item img {
+    width: 1em;
+    height: 1em;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.heart-hud {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+}
+
+.heart-hud.hidden {
+    display: none;
+}
+
+.heart-hud img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* 좌우 쳐내기 이펙트 */
+.fly-left {
+    transform: translate(-300px, -100px) rotate(-120deg) scale(0.5) !important;
+    opacity: 0 !important;
+    transition: all 0.2s ease-in !important;
+}
+.fly-right {
+    transform: translate(300px, -100px) rotate(120deg) scale(0.5) !important;
+    opacity: 0 !important;
+    transition: all 0.2s ease-in !important;
+}
+
+/* 고콤보 연출 */
+.combo-crazy {
+    animation: textPulse 0.3s infinite alternate;
+    color: #EF4444 !important;
+    text-shadow: 0 0 12px #EF4444, 0 0 25px #F59E0B;
+}
+@keyframes textPulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.15); }
+}
+
+/* 오버로드 다단계 화면 흔들림 */
+.shake-low {
+    animation: pulseBg 1.5s infinite alternate;
+}
+.shake-medium {
+    animation: shakeScreen 0.08s infinite, pulseBgFast 0.4s infinite alternate;
+}
+@keyframes shakeScreen {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    100% { transform: translate(-1px, -1px) rotate(0.5deg); }
+}
+@keyframes pulseBg {
+    0% { box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.2); }
+    100% { box-shadow: inset 0 0 50px rgba(239, 68, 68, 0.4); }
+}
+@keyframes pulseBgFast {
+    0% { box-shadow: inset 0 0 50px rgba(239, 68, 68, 0.4); }
+    100% { box-shadow: inset 0 0 100px rgba(239, 68, 68, 0.8); }
+}
+
+/* 피버 게이지 부르르 진동 */
+.fever-imminent {
+    animation: shakeGauge 0.1s infinite;
+}
+@keyframes shakeGauge {
+    0% { transform: translate(1px, 0); }
+    100% { transform: translate(-1px, 0); }
+}
+
+/* 수직 점수 팝업 */
+@keyframes pop-up {
+    0% { opacity: 0; transform: translate(-50%, 0) scale(0.7); }
+    20% { opacity: 1; transform: translate(-50%, -30px) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%, -90px) scale(1); }
+}
+.floating-score {
+    position: absolute;
+    left: 50%;
+    bottom: 15%;
+    color: #fbbf24;
+    font-weight: 900;
+    font-size: 2.5rem;
+    text-shadow: 0 4px 8px black;
+    pointer-events: none;
+    animation: pop-up 0.45s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    z-index: 100;
+}
+.pop-score { color: #10B981; }
+.pop-score-fire { color: #EF4444; font-size: 2.8rem; text-shadow: 0 0 10px #F59E0B; }
+.pop-time { color: #3B82F6; }
+.pop-fail { color: #DC2626; }
+
+/* 💜 피버 타임 기본 다크 그라데이션 고정 */
+.bg-fever {
+    background: linear-gradient(to bottom, #1e1b4b, #311042) !important;
+}
+
+/* FEVER WARNING FLASH OVERLAY (토스 미니게임 감성 반짝임) */
+#fever-flash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: rgba(255, 255, 255, 0.08);
+    z-index: 40;
+}
+
+/* 3초 전 느린 경고 */
+.flash-warning-slow {
+    animation: flashWarningSlow 0.8s ease-in-out infinite;
+}
+@keyframes flashWarningSlow {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.25; background-color: #ef4444; }
+}
+
+/* 1.2초 전 가속 경고 */
+.flash-warning-fast {
+    animation: flashWarningFast 0.2s ease-in-out infinite;
+}
+@keyframes flashWarningFast {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.45; background-color: #ef4444; }
+}
+
+/* 🎯 [기획 추가] 피버 종료 전 백그라운드 실시간 강제 가속 스위칭 코드 */
+@keyframes feverWarningBlink {
+    0%, 100% { background: #fef08a !important; } /* 노란 사이렌 */
+    50% { background: #ef4444 !important; }     /* 빨간 사이렌 */   
+}
+.bg-fever-blink-slow {
+    background: linear-gradient(to bottom, #fef08a, #fef08a) !important;
+    animation: feverWarningBlink 0.4s infinite ease-in-out !important;
+}
+.bg-fever-blink-fast {
+    background: linear-gradient(to bottom, #ef4444, #ef4444) !important;
+    animation: feverWarningBlink 0.15s infinite ease-in-out !important;
+}
+
+.fever-ui-pulse {
+    animation: uiPulse 0.3s infinite alternate;
+}
+@keyframes uiPulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+}
+
+.btn-fever-warning {
+    animation: btnPulse 0.2s infinite alternate;
+}
+@keyframes btnPulse {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.4) saturate(1.2); }
+}
+/* =========================
+   컨베이어 벨트
+========================= */
+
+/* =========================
+   컨베이어 벨트
+========================= */
+
+#belt-area {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+.belt {
+    width: 8vw;
+    height: 140vh;
+
+    background-image: url("Assets/Background/belt.png");
+    background-repeat: repeat-y;
+    background-size: 100% 111px;
+    background-position-y: var(--belt-y, 0px);
+
+    image-rendering: pixelated;
+
+    transform:
+        perspective(900px)
+        rotateX(70deg);
+
+    transform-origin: top center;
+
+    transition: background-position-y 0.08s steps(2);
+
+    opacity: 0.80;
+}
+/* 시작/결과 화면에서는 벨트 숨김 */
+#start-screen:not(.hidden) ~ #belt-area,
+#result-screen:not(.hidden) ~ #belt-area {
+    display: none;
+}
+
+/* 게임 화면이 숨겨져 있으면 내부 벨트도 숨김 */
+#game-screen.hidden #belt-area {
+    display: none;
+}
+
+/* 벨트가 버튼/시작화면 위로 튀어나오지 않게 */
+#belt-area {
+    z-index: 1;
+}
+
+#item-stack {
+    z-index: 20;
+}
+
+#start-screen,
+#result-screen,
+#ranking-screen {
+    z-index: 50;
+}
