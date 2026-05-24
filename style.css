@@ -164,6 +164,32 @@ html, body {
 }
 
 /* 고콤보 연출 */
+.tap-impact {
+    animation: tapImpact 0.06s ease-out;
+}
+
+@keyframes tapImpact {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.98); }
+    100% { transform: scale(1); }
+}
+
+.button-impact {
+    animation: buttonImpact 0.08s ease-out;
+}
+
+@keyframes buttonImpact {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(0.94); filter: brightness(1.15); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+.combo-hot {
+    animation: textPulse 0.45s infinite alternate;
+    color: #F59E0B !important;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.75);
+}
+
 .combo-crazy {
     animation: textPulse 0.3s infinite alternate;
     color: #EF4444 !important;
@@ -227,8 +253,82 @@ html, body {
 .pop-fail { color: #DC2626; }
 
 /* 💜 피버 타임 기본 다크 그라데이션 고정 */
+.impact-burst {
+    position: absolute;
+    width: 4.25rem;
+    height: 4.25rem;
+    border-radius: 999px;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.35);
+    animation: impactBurst 0.42s ease-out forwards;
+    z-index: 95;
+}
+
+.impact-coin {
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.95), rgba(250, 204, 21, 0) 68%);
+    box-shadow: 0 0 18px rgba(250, 204, 21, 0.85);
+}
+
+.impact-time {
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.7), rgba(14, 165, 233, 0) 72%);
+    box-shadow: 0 0 18px rgba(59, 130, 246, 0.8);
+}
+
+.impact-jewel {
+    background: radial-gradient(circle, rgba(52, 211, 153, 0.95), rgba(168, 85, 247, 0.35) 42%, rgba(52, 211, 153, 0) 74%);
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.9);
+}
+
+.impact-bomb,
+.impact-fail {
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.85), rgba(127, 29, 29, 0) 72%);
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.9);
+}
+
+.impact-waste {
+    background: radial-gradient(circle, rgba(71, 85, 105, 0.82), rgba(15, 23, 42, 0) 70%);
+    box-shadow: 0 0 18px rgba(51, 65, 85, 0.75);
+}
+
+@keyframes impactBurst {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.25); }
+    30% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.45); }
+}
+
 .bg-fever {
     background: linear-gradient(to bottom, #1e1b4b, #311042) !important;
+}
+
+.fever-hit {
+    animation: feverHit 0.22s ease-out;
+}
+
+.fever-pop {
+    position: absolute;
+    left: 50%;
+    top: 32%;
+    transform: translate(-50%, -50%);
+    color: #fef08a;
+    font-size: 3.2rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-shadow: 0 0 12px #f59e0b, 0 0 28px #22d3ee;
+    pointer-events: none;
+    animation: feverPop 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    z-index: 110;
+}
+
+@keyframes feverHit {
+    0% { filter: saturate(1); }
+    45% { filter: saturate(1.8) brightness(1.15); }
+    100% { filter: saturate(1); }
+}
+
+@keyframes feverPop {
+    0% { opacity: 0; transform: translate(-50%, -42%) scale(0.7); }
+    22% { opacity: 1; transform: translate(-50%, -50%) scale(1.14); }
+    100% { opacity: 0; transform: translate(-50%, -64%) scale(1); }
 }
 
 /* FEVER WARNING FLASH OVERLAY (토스 미니게임 감성 반짝임) */
@@ -330,6 +430,15 @@ html, body {
 
     opacity: 0.80;
 }
+
+.bg-fever .belt {
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.8), inset 0 0 18px rgba(250, 204, 21, 0.35);
+    filter: saturate(1.35) brightness(1.08);
+}
+
+.bg-fever .stack-item img {
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.7));
+}
 /* 시작/결과 화면에서는 벨트 숨김 */
 #start-screen:not(.hidden) ~ #belt-area,
 #result-screen:not(.hidden) ~ #belt-area {
@@ -354,4 +463,33 @@ html, body {
 #result-screen,
 #ranking-screen {
     z-index: 50;
+}
+
+.result-grade {
+    color: #0f172a;
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0;
+    text-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+}
+
+.result-grade-f {
+    color: #64748b;
+}
+
+.result-grade-c,
+.result-grade-b {
+    color: #2563eb;
+}
+
+.result-grade-a {
+    color: #10b981;
+    text-shadow: 0 0 18px rgba(16, 185, 129, 0.4);
+}
+
+.result-grade-s,
+.result-grade-ss {
+    color: #f59e0b;
+    text-shadow: 0 0 16px rgba(245, 158, 11, 0.65), 0 0 28px rgba(34, 211, 238, 0.35);
 }

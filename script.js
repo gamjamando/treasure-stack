@@ -11,7 +11,7 @@ const WRONG_SCORE_PENALTY = 200;
 const CHALLENGE_GRACE_SECONDS = 10;
 const CHALLENGE_START_DROP_INTERVAL = 4.0;
 const CHALLENGE_MIN_DROP_INTERVAL = 0.9;
-const CHALLENGE_ACCELERATION = 0.018;
+const CHALLENGE_SPEEDUP_RATE = 0.97;
 const OVERLOAD_WARN_LOW = 14;
 const OVERLOAD_WARN_HIGH = 18;
 const OVERLOAD_LIMIT = 22;
@@ -24,6 +24,7 @@ const HEART_FULL_SRC = "Assets/UI/heart_full.png";
 const HEART_BREAK_SRC = "Assets/UI/heart_break.png";
 const HEART_EMPTY_SRC = "Assets/UI/heart_empty.png";
 const HEART_BREAK_DURATION_MS = 300;
+const DEFAULT_BELT_BUMP = 13;
 
 let state = {
     currentGameMode: "CLASSIC",
@@ -61,11 +62,8 @@ let rankingLoadFailed = false;
 
 let beltOffset = 0;
 
-const BELT_STEP = 13;
-
-function bumpBelt() {
-
-    beltOffset += BELT_STEP;
+function bumpBelt(amount = DEFAULT_BELT_BUMP) {
+    beltOffset += amount;
 
     document.documentElement.style.setProperty(
         "--belt-y",
@@ -92,6 +90,7 @@ const els = {
     resBest: document.getElementById("res-best"),
     resTime: document.getElementById("res-time"),
     resCombo: document.getElementById("res-combo"),
+    resGrade: document.getElementById("res-grade"),
     feverBar: document.getElementById("fever-bar"),
     flash: document.getElementById("fever-flash"),
     btnLeft: document.getElementById("btn-left"),
@@ -101,6 +100,7 @@ const els = {
     rankingPageList: document.getElementById("ranking-page-list"),
     rankAnchor: document.getElementById("ranking-box-anchor"),
     btnAgain: document.getElementById("btn-again"),
+    btnResultHome: document.getElementById("btn-result-home"),
     btnGameMenu: document.getElementById("btn-game-menu"),
 gameMenuModal: document.getElementById("game-menu-modal"),
 btnRetry: document.getElementById("btn-retry"),
@@ -278,6 +278,8 @@ function clearFeverEffects() {
     els.combo.classList.remove("fever-ui-pulse");
     els.btnLeft.classList.remove("btn-fever-warning");
     els.btnRight.classList.remove("btn-fever-warning");
+    els.gameScreen.classList.remove("tap-impact");
+    els.rail.classList.remove("fever-hit");
 }
 
 function clearBreakingHeart() {
@@ -317,6 +319,67 @@ function showBreakingHeart(index) {
     }, HEART_BREAK_DURATION_MS);
 }
 
+function restartAnimation(node, className) {
+    if (!node) return;
+    node.classList.remove(className);
+    void node.offsetWidth;
+    node.classList.add(className);
+}
+
+function pulseInput(direction) {
+    restartAnimation(els.gameScreen, "tap-impact");
+    restartAnimation(direction === "L" ? els.btnLeft : els.btnRight, "button-impact");
+}
+
+function getComboLabel(combo) {
+    if (combo >= 50) return "GODLIKE";
+    if (combo >= 30) return "OVERDRIVE";
+    if (combo >= 20) return "CRAZY";
+    if (combo >= 10) return "HOT";
+    return "";
+}
+
+function updateComboText() {
+    const label = getComboLabel(state.combo);
+    els.combo.innerText = label ? `${state.combo} COMBO - ${label}` : `콤보: ${state.combo}`;
+    els.combo.classList.toggle("combo-hot", state.combo >= 10 && state.combo < 20);
+    els.combo.classList.toggle("combo-crazy", state.combo >= 20);
+}
+
+function getResultGrade(score, maxCombo) {
+    if (score >= 30000 || maxCombo >= 80) return "SS";
+    if (score >= 20000 || maxCombo >= 50) return "S";
+    if (score >= 12000 || maxCombo >= 30) return "A";
+    if (score >= 7000 || maxCombo >= 20) return "B";
+    if (score >= 3000 || maxCombo >= 10) return "C";
+    return "F";
+}
+
+function showImpactBurst(activeNode, itemType, isCorrect) {
+    if (!activeNode) return;
+
+    const railRect = els.rail.getBoundingClientRect();
+    const itemRect = activeNode.getBoundingClientRect();
+    const burst = document.createElement("div");
+    const effectType = isCorrect ? itemType.toLowerCase() : "fail";
+
+    burst.style.left = `${itemRect.left + itemRect.width / 2 - railRect.left}px`;
+    burst.style.top = `${itemRect.top + itemRect.height / 2 - railRect.top}px`;
+    burst.className = `impact-burst impact-${effectType}`;
+
+    els.floatLayer.appendChild(burst);
+    setTimeout(() => burst.remove(), 420);
+}
+
+function triggerFeverIntro() {
+    const feverPop = document.createElement("div");
+    feverPop.className = "fever-pop";
+    feverPop.textContent = "FEVER!!";
+    els.floatLayer.appendChild(feverPop);
+    restartAnimation(els.rail, "fever-hit");
+    setTimeout(() => feverPop.remove(), 700);
+}
+
 function startGame(mode) {
     state.currentGameMode = mode;
     state.currentTimer = START_TIMER;
@@ -332,6 +395,7 @@ function startGame(mode) {
     state.isGameOver = false;
     state.lives = 3;
     clearBreakingHeart();
+    updateComboText();
 
     itemDropTimer = 0;
     currentDropInterval = CHALLENGE_START_DROP_INTERVAL;
@@ -460,9 +524,10 @@ function gameLoop(timestamp) {
     } else {
         if (!state.isFever && state.survivedTime >= CHALLENGE_GRACE_SECONDS) {
             itemDropTimer += dt;
+            const challengeElapsed = state.survivedTime - CHALLENGE_GRACE_SECONDS;
             currentDropInterval = Math.max(
                 CHALLENGE_MIN_DROP_INTERVAL,
-                CHALLENGE_START_DROP_INTERVAL - (state.survivedTime - CHALLENGE_GRACE_SECONDS) * CHALLENGE_ACCELERATION
+                CHALLENGE_START_DROP_INTERVAL * Math.pow(CHALLENGE_SPEEDUP_RATE, challengeElapsed)
             );
 
             if (itemDropTimer >= currentDropInterval) {
@@ -482,10 +547,7 @@ function gameLoop(timestamp) {
     updateFeverEffects(dt);
 
     els.score.innerText = `점수: ${state.score.toLocaleString()}`;
-    els.combo.innerText = `콤보: ${state.combo}`;
-
-    if (state.combo >= 20) els.combo.classList.add("combo-crazy");
-    else els.combo.classList.remove("combo-crazy");
+    updateComboText();
 
     loopFrameId = requestAnimationFrame(gameLoop);
 }
@@ -536,7 +598,7 @@ function processInput(direction) {
     if (state.isGameOver || state.stack.length === 0) return;
     if (isResolvingInput) return;
 
-    bumpBelt();
+    pulseInput(direction);
 
     isResolvingInput = true;
     const wasFeverInput = state.isFever;
@@ -556,6 +618,8 @@ function processInput(direction) {
 
     if (isCorrect) {
         handleCorrectInput(itemType, activeNode);
+        showImpactBurst(activeNode, itemType, true);
+        bumpBelt(itemType === "BOMB" ? 22 : 10);
 
         if (!state.isFever) {
             state.feverGauge = Math.min(state.maxFeverGauge, state.feverGauge + 5);
@@ -568,11 +632,14 @@ function processInput(direction) {
                 els.gameScreen.className = "relative flex-1 w-full h-[100dvh] flex flex-col items-center pt-2 transition-transform bg-fever shadow-inner overflow-hidden screen";
                 state.stack = [];
                 for (let i = 0; i < FEVER_STACK_SIZE; i++) pushNewItem();
+                triggerFeverIntro();
                 triggeredFever = true;
             }
         }
     } else {
         handleWrongInput(itemType, activeNode);
+        showImpactBurst(activeNode, itemType, false);
+        bumpBelt(24);
     }
 
     if (activeNode) activeNode.classList.add(direction === "L" ? "fly-left" : "fly-right");
@@ -611,6 +678,7 @@ function handleCorrectInput(itemType, activeNode) {
 
     state.combo++;
     if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+    updateComboText();
 }
 
 function handleWrongInput(itemType, activeNode) {
@@ -630,6 +698,7 @@ function handleWrongInput(itemType, activeNode) {
         state.lives--;
         showBreakingHeart(state.lives);
     }
+    updateComboText();
 
     const text = state.currentGameMode === "CLASSIC"
         ? (itemType === "BOMB" ? "-3초! 💥" : "틀림!")
@@ -776,6 +845,11 @@ setTimeout(() => {
 
     els.resScore.innerText = state.score.toLocaleString();
     els.resCombo.innerText = state.maxCombo;
+    if (els.resGrade) {
+        const grade = getResultGrade(state.score, state.maxCombo);
+        els.resGrade.innerText = grade;
+        els.resGrade.className = `result-grade result-grade-${grade.toLowerCase()}`;
+    }
 
     const min = Math.floor(state.survivedTime / 60).toString().padStart(2, "0");
     const sec = Math.floor(state.survivedTime % 60).toString().padStart(2, "0");
@@ -824,7 +898,11 @@ function closeRankingPage() {
 
 els.btnClassic.addEventListener("pointerdown", () => startGame("CLASSIC"));
 els.btnChallenge.addEventListener("pointerdown", () => startGame("CHALLENGE"));
-els.btnAgain.addEventListener("pointerdown", backToMenu);
+els.btnAgain.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    startGame(state.currentGameMode);
+});
+els.btnResultHome.addEventListener("pointerdown", backToMenu);
 els.btnRankBack.addEventListener("pointerdown", closeRankingPage);
 els.btnGameMenu.addEventListener("pointerdown", (e) => {
     e.preventDefault();
@@ -879,6 +957,7 @@ const beltHeight = 128;
 const speed = 1;
 
 function animateBelt() {
+  if (!belt1 || !belt2) return;
 
   y1 += speed;
   y2 += speed;
