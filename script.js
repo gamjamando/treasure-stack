@@ -96,7 +96,19 @@ const achievementDefinitions = {
     trash_master: { title: "쓰레기 수집가", description: "석탄만 연속 획득" },
     greed_mode: { title: "욕심 ON", description: "아이템을 쉬지 않고 획득" },
     panic_clicker: { title: "패닉 상태", description: "1초 내 연속 입력" },
-    coin_addict: { title: "동전 중독", description: "코인 총 100개 획득" }
+    coin_addict: { title: "동전 중독", description: "코인 총 100개 획득" },
+    fever_once: { title: "과열 상태", description: "한 판에서 피버 1회 달성" },
+
+    fever_3_run: { title: "GOLD RUSH", description: "한 판에서 피버 3회 달성" },
+    fever_5_run: { title: "멈출 수 없어", description: "한 판에서 피버 5회 달성" },
+    fever_chain_master: { title: "피버 머신", description: "한 판에서 연속 피버 달성" },
+    total_fever_10: { title: "피버 입문자", description: "총 피버 10회 달성" },
+    total_fever_50: { title: "황금 중독", description: "총 피버 50회 달성" },
+    total_fever_100: { title: "피버광", description: "총 피버 100회 달성" },
+    total_fever_300: { title: "과열된 인간", description: "총 피버 300회 달성" },
+    total_fever_1000: { title: "레일이 불타고 있다", description: "총 피버 1000회 달성" },
+    fever_save: { title: "기사회생", description: "위험 상태에서 피버 진입" },
+    fever_addict: { title: "피버 없인 못 살아", description: "피버만 3번 연속 진입" },
 };
 
 let achievementData = loadAchievementData();
@@ -205,10 +217,10 @@ const els = {
     achievementList: document.getElementById("achievement-list"),
     achievementToast: document.getElementById("achievement-toast"),
     achievementToastTitle: document.getElementById("achievement-toast-title"),
-gameMenuModal: document.getElementById("game-menu-modal"),
-btnRetry: document.getElementById("btn-retry"),
-btnHome: document.getElementById("btn-home"),
-btnResume: document.getElementById("btn-resume"),
+    gameMenuModal: document.getElementById("game-menu-modal"),
+    btnRetry: document.getElementById("btn-retry"),
+    btnHome: document.getElementById("btn-home"),
+    btnResume: document.getElementById("btn-resume"),
     titleMode: document.getElementById("hud-title-mode"),
     resModeLabel: document.getElementById("res-mode-label"),
     btnClassic: document.getElementById("btn-start-classic"),
@@ -272,7 +284,7 @@ function playTone(type, combo = 0) {
             osc.start(now);
             osc.stop(now + 0.35);
         }
-    } catch (e) {}
+    } catch (e) { }
 }
 
 async function loadOnlineRankings() {
@@ -770,10 +782,10 @@ function renderStack() {
 
         const imgName =
             type === "COIN" ? "Assets/Items/coin.png" :
-            type === "JEWEL" ? "Assets/Items/jewel.png" :
-            type === "WASTE" ? "Assets/Items/coal.png" :
-            type === "BOMB" ? "Assets/Items/dynamite.png" :
-            "Assets/Items/hourglass.png";
+                type === "JEWEL" ? "Assets/Items/jewel.png" :
+                    type === "WASTE" ? "Assets/Items/coal.png" :
+                        type === "BOMB" ? "Assets/Items/dynamite.png" :
+                            "Assets/Items/hourglass.png";
 
         node.innerHTML = `<img src="${imgName}" class="w-10 h-10 object-contain block mx-auto">`;
         els.stack.appendChild(node);
@@ -1148,12 +1160,12 @@ function endGame(reason) {
     els.gameScreen.classList.add("hidden");
     els.resultScreen.classList.remove("hidden");
     els.btnAgain.disabled = true;
-els.btnAgain.style.pointerEvents = "none";
+    els.btnAgain.style.pointerEvents = "none";
 
-setTimeout(() => {
-    els.btnAgain.disabled = false;
-    els.btnAgain.style.pointerEvents = "auto";
-}, 700);
+    setTimeout(() => {
+        els.btnAgain.disabled = false;
+        els.btnAgain.style.pointerEvents = "auto";
+    }, 700);
 
     els.resModeLabel.innerText = state.currentGameMode;
 
@@ -1304,23 +1316,23 @@ const beltHeight = 128;
 const speed = 1;
 
 function animateBelt() {
-  if (!belt1 || !belt2) return;
+    if (!belt1 || !belt2) return;
 
-  y1 += speed;
-  y2 += speed;
+    y1 += speed;
+    y2 += speed;
 
-  if (y1 >= beltHeight) {
-    y1 = y2 - beltHeight;
-  }
+    if (y1 >= beltHeight) {
+        y1 = y2 - beltHeight;
+    }
 
-  if (y2 >= beltHeight) {
-    y2 = y1 - beltHeight;
-  }
+    if (y2 >= beltHeight) {
+        y2 = y1 - beltHeight;
+    }
 
-  belt1.style.top = y1 + "px";
-  belt2.style.top = y2 + "px";
+    belt1.style.top = y1 + "px";
+    belt2.style.top = y2 + "px";
 
-  requestAnimationFrame(animateBelt);
+    requestAnimationFrame(animateBelt);
 }
 
 animateBelt();
