@@ -356,7 +356,7 @@ html, body {
 }
 @keyframes flashWarningSlow {
     0%, 100% { opacity: 0; }
-    50% { opacity: 0.25; background-color: #ef4444; }
+    50% { opacity: 0.14; background-color: #f97316; }
 }
 
 /* 1.2초 전 가속 경고 */
@@ -365,21 +365,7 @@ html, body {
 }
 @keyframes flashWarningFast {
     0%, 100% { opacity: 0; }
-    50% { opacity: 0.45; background-color: #ef4444; }
-}
-
-/* 🎯 [기획 추가] 피버 종료 전 백그라운드 실시간 강제 가속 스위칭 코드 */
-@keyframes feverWarningBlink {
-    0%, 100% { background: #fef08a !important; } /* 노란 사이렌 */
-    50% { background: #ef4444 !important; }     /* 빨간 사이렌 */   
-}
-.bg-fever-blink-slow {
-    background: linear-gradient(to bottom, #fef08a, #fef08a) !important;
-    animation: feverWarningBlink 0.4s infinite ease-in-out !important;
-}
-.bg-fever-blink-fast {
-    background: linear-gradient(to bottom, #ef4444, #ef4444) !important;
-    animation: feverWarningBlink 0.15s infinite ease-in-out !important;
+    50% { opacity: 0.22; background-color: #ef4444; }
 }
 
 .fever-ui-pulse {

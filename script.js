@@ -607,10 +607,11 @@ function updateFeverEffects(dt) {
         } else if (state.feverTimer <= 1.2) {
             targetFlashClass = "flash-warning-fast";
             shouldPulse = true;
-            els.gameScreen.className = "relative flex-1 w-full flex flex-col items-center pt-2 transition-transform shadow-inner overflow-hidden bg-fever-blink-fast screen";
+            els.gameScreen.className = "relative flex-1 w-full h-[100dvh] flex flex-col items-center pt-2 transition-transform bg-fever shadow-inner overflow-hidden screen";
         } else if (state.feverTimer <= 3.0) {
             targetFlashClass = "flash-warning-slow";
-            els.gameScreen.className = "relative flex-1 w-full flex flex-col items-center pt-2 transition-transform shadow-inner overflow-hidden bg-fever-blink-slow screen";
+            shouldPulse = true;
+            els.gameScreen.className = "relative flex-1 w-full h-[100dvh] flex flex-col items-center pt-2 transition-transform bg-fever shadow-inner overflow-hidden screen";
         } else {
             els.gameScreen.className = "relative flex-1 w-full h-[100dvh] flex flex-col items-center pt-2 transition-transform bg-fever shadow-inner overflow-hidden screen";
         }
