@@ -786,6 +786,7 @@ setTimeout(() => {
 }
 
 function backToMenu() {
+    els.gameScreen.classList.add("hidden");
     els.resultScreen.classList.add("hidden");
     els.startScreen.classList.remove("hidden");
 }
