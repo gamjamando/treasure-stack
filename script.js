@@ -46,6 +46,7 @@ let state = {
     maxFeverGauge: FEVER_GAUGE_BASE,
     stack: [],
     isGameOver: false,
+    hasStartedInput: false,
     lives: 3
 };
 
@@ -463,6 +464,7 @@ function startGame(mode) {
     state.maxFeverGauge = FEVER_GAUGE_BASE;
     state.stack = [];
     state.isGameOver = false;
+    state.hasStartedInput = false;
     state.lives = 3;
     clearBreakingHeart();
     updateComboText();
@@ -601,6 +603,12 @@ function gameLoop(timestamp) {
     let dt = (timestamp - lastUpdateTime) / 1000;
     if (dt > 0.2) dt = 0.2;
     lastUpdateTime = timestamp;
+
+    if (!state.hasStartedInput) {
+        loopFrameId = requestAnimationFrame(gameLoop);
+        return;
+    }
+
     state.survivedTime += dt;
 
     if (state.currentGameMode === "CLASSIC") {
@@ -687,6 +695,11 @@ function processInput(direction) {
 
     if (state.isGameOver || state.stack.length === 0) return;
     if (isResolvingInput) return;
+
+    if (!state.hasStartedInput) {
+        state.hasStartedInput = true;
+        lastUpdateTime = performance.now();
+    }
 
     isResolvingInput = true;
     const wasFeverInput = state.isFever;
@@ -791,7 +804,7 @@ function handleWrongInput(itemType, activeNode) {
         showBreakingHeart(state.lives);
     }
     if (itemType === "BOMB" || state.currentGameMode === "CHALLENGE") {
-        triggerScreenShake(itemType === "BOMB" ? 1.8 : 1.2, itemType === "BOMB" ? 140 : 110);
+        triggerScreenShake(itemType === "BOMB" ? 2.2 : 1.45, itemType === "BOMB" ? 150 : 125);
     }
     updateComboText();
 
