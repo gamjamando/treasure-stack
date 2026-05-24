@@ -94,6 +94,67 @@ html, body {
     100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
+.achievement-button {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 70;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.82);
+    color: #92400e;
+    font-size: 0.85rem;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: 0 0 16px rgba(250, 204, 21, 0.35);
+}
+
+.achievement-toast {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    z-index: 80;
+    min-width: min(84vw, 280px);
+    transform: translate(-50%, -120%);
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(250, 204, 21, 0.55);
+    border-radius: 1rem;
+    background: rgba(15, 23, 42, 0.92);
+    color: #fde68a;
+    text-align: center;
+    pointer-events: none;
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.65);
+}
+
+.achievement-toast span {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.achievement-toast strong {
+    display: block;
+    margin-top: 0.25rem;
+    color: #facc15;
+    font-size: 1rem;
+    line-height: 1.1;
+    text-shadow: 0 0 12px rgba(250, 204, 21, 0.8);
+}
+
+.achievement-toast-show {
+    animation: achievementToast 2s ease forwards;
+}
+
+@keyframes achievementToast {
+    0% { opacity: 0; transform: translate(-50%, -120%) scale(0.96); }
+    12% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    82% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -80%) scale(0.98); }
+}
+
 .bg-normal {
     background-color: #ffffff !important;
     background: #ffffff !important;
@@ -123,56 +184,56 @@ html, body {
 ========================= */
 
 .pos-0 {
-    bottom: 4%;
-    transform: scale(1.2);
+    bottom: 3%;
+    transform: scale(1.24);
     z-index: 60;
     opacity: 1;
 }
 
 .pos-1 {
-    bottom: 16%;
-    transform: scale(1.05);
+    bottom: 18%;
+    transform: scale(1.06);
     z-index: 50;
     opacity: 1;
 }
 
 .pos-2 {
-    bottom: 28%;
-    transform: scale(0.92);
+    bottom: 32%;
+    transform: scale(0.91);
     z-index: 40;
     opacity: 1;
 }
 
 .pos-3 {
-    bottom: 40%;
-    transform: scale(0.80);
+    bottom: 45%;
+    transform: scale(0.78);
     z-index: 30;
     opacity: 1;
 }
 
 .pos-4 {
-    bottom: 52%;
-    transform: scale(0.68);
+    bottom: 57%;
+    transform: scale(0.66);
     z-index: 20;
     opacity: 1;
 }
 
 .pos-5 {
-    bottom: 63%;
-    transform: scale(0.56);
+    bottom: 68%;
+    transform: scale(0.55);
     z-index: 15;
     opacity: 0.95;
 }
 
 .pos-6 {
-    bottom: 73%;
+    bottom: 77%;
     transform: scale(0.46);
     z-index: 10;
     opacity: 0.9;
 }
 
 .pos-7 {
-    bottom: 82%;
+    bottom: 84%;
     transform: scale(0.38);
     z-index: 5;
     opacity: 0.85;
@@ -589,6 +650,38 @@ html, body {
 .result-grade-ss {
     color: #f59e0b;
     text-shadow: 0 0 16px rgba(245, 158, 11, 0.65), 0 0 28px rgba(34, 211, 238, 0.35);
+}
+
+.result-score-label {
+    margin-bottom: 0.1rem;
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+}
+
+.result-final-score {
+    margin-bottom: 0.75rem;
+    color: #0f172a;
+    font-size: clamp(2.6rem, 12vw, 4rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0;
+}
+
+.result-best-line {
+    margin-bottom: 1rem;
+    color: #94a3b8;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.result-best-line span {
+    margin-left: 0.35rem;
+    color: #2563eb;
+    font-size: 1rem;
+    letter-spacing: 0;
 }
 
 .full-combo-badge {

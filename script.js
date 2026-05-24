@@ -34,6 +34,19 @@ const HEART_BREAK_SRC = "Assets/UI/heart_break.png";
 const HEART_EMPTY_SRC = "Assets/UI/heart_empty.png";
 const HEART_BREAK_DURATION_MS = 300;
 const DEFAULT_BELT_BUMP = 13;
+const ACHIEVEMENT_STORAGE_KEY = "ts_achievements";
+
+const achievementDefinitions = {
+    first_play: { title: "첫 플레이" },
+    score_100k: { title: "10만점 달성" },
+    score_300k: { title: "30만점 달성" },
+    first_full_combo: { title: "FULL COMBO" },
+    combo_100: { title: "100콤보 달성" },
+    first_fever: { title: "첫 피버 진입" },
+    challenge_1min: { title: "챌린지 1분 생존" }
+};
+
+let achievementData = loadAchievementData();
 
 let state = {
     currentGameMode: "CLASSIC",
@@ -68,6 +81,7 @@ let bestScoreClassic = parseInt(localStorage.getItem("ts_classic_best")) || 0;
 let bestScoreChallenge = parseInt(localStorage.getItem("ts_challenge_best")) || 0;
 let arcadeRankings = [];
 let rankingLoadFailed = false;
+let achievementToastTimer = null;
 
 
 /* =========================
@@ -83,6 +97,19 @@ function bumpBelt(amount = DEFAULT_BELT_BUMP) {
         "--belt-y",
         `${beltOffset}px`
     );
+}
+
+function loadAchievementData() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(ACHIEVEMENT_STORAGE_KEY) || "{}");
+        return { unlocked: saved.unlocked || {} };
+    } catch (e) {
+        return { unlocked: {} };
+    }
+}
+
+function saveAchievementData() {
+    localStorage.setItem(ACHIEVEMENT_STORAGE_KEY, JSON.stringify(achievementData));
 }
 
 const els = {
@@ -119,6 +146,9 @@ const els = {
     btnAgain: document.getElementById("btn-again"),
     btnResultHome: document.getElementById("btn-result-home"),
     btnGameMenu: document.getElementById("btn-game-menu"),
+    achievementButton: document.getElementById("achievement-button"),
+    achievementToast: document.getElementById("achievement-toast"),
+    achievementToastTitle: document.getElementById("achievement-toast-title"),
 gameMenuModal: document.getElementById("game-menu-modal"),
 btnRetry: document.getElementById("btn-retry"),
 btnHome: document.getElementById("btn-home"),
@@ -349,6 +379,48 @@ function setFeverBackground(isFever) {
     els.gameScreen.classList.toggle("bg-white", !isFever);
 }
 
+function updateAchievementButton() {
+    if (!els.achievementButton) return;
+    const total = Object.keys(achievementDefinitions).length;
+    const unlocked = Object.values(achievementData.unlocked).filter(Boolean).length;
+    els.achievementButton.textContent = `👑 ${unlocked} / ${total}`;
+}
+
+function showAchievementToast(title) {
+    if (!els.achievementToast || !els.achievementToastTitle) return;
+
+    els.achievementToastTitle.textContent = title;
+    els.achievementToast.classList.remove("hidden");
+    els.achievementToast.classList.remove("achievement-toast-show");
+    void els.achievementToast.offsetWidth;
+    els.achievementToast.classList.add("achievement-toast-show");
+
+    if (achievementToastTimer) clearTimeout(achievementToastTimer);
+    achievementToastTimer = setTimeout(() => {
+        els.achievementToast.classList.add("hidden");
+        els.achievementToast.classList.remove("achievement-toast-show");
+        achievementToastTimer = null;
+    }, 2000);
+}
+
+function unlockAchievement(id) {
+    if (!achievementDefinitions[id] || achievementData.unlocked[id]) return false;
+
+    achievementData.unlocked[id] = true;
+    saveAchievementData();
+    updateAchievementButton();
+    showAchievementToast(achievementDefinitions[id].title);
+    return true;
+}
+
+function checkAchievements() {
+    if (state.score >= 100000) unlockAchievement("score_100k");
+    if (state.score >= 300000) unlockAchievement("score_300k");
+    if (state.maxCombo >= 100 || state.combo >= 100) unlockAchievement("combo_100");
+    if (state.comboBreakCount === 0 && state.maxCombo > 0 && state.isGameOver) unlockAchievement("first_full_combo");
+    if (state.currentGameMode === "CHALLENGE" && state.survivedTime >= 60) unlockAchievement("challenge_1min");
+}
+
 function triggerScreenShake(intensity = 1, duration = 110) {
     const clampedIntensity = Math.max(0.5, Math.min(2.5, intensity));
     const clampedDuration = Math.max(80, Math.min(150, duration));
@@ -486,6 +558,7 @@ function triggerFeverIntro() {
 }
 
 function startGame(mode) {
+    unlockAchievement("first_play");
     state.currentGameMode = mode;
     state.currentTimer = START_TIMER;
     state.score = 0;
@@ -677,6 +750,7 @@ function gameLoop(timestamp) {
             endGame("DIED");
             return;
         }
+        checkAchievements();
     }
 
     updateFeverEffects(dt);
@@ -772,6 +846,7 @@ function processInput(direction) {
                 setFeverBackground(true);
                 state.stack = [];
                 fillStackToSize(state.currentGameMode === "CHALLENGE" ? CHALLENGE_FEVER_STACK_SIZE : FEVER_STACK_SIZE);
+                unlockAchievement("first_fever");
                 triggerFeverIntro();
                 triggeredFever = true;
             }
@@ -822,6 +897,7 @@ function handleCorrectInput(itemType, activeNode) {
     state.combo++;
     if (state.combo > state.maxCombo) state.maxCombo = state.combo;
     maybeAwardCleanBonus(activeNode);
+    checkAchievements();
     updateComboText();
 }
 
@@ -1003,6 +1079,7 @@ setTimeout(() => {
     if (els.resFullCombo) {
         els.resFullCombo.classList.toggle("hidden", state.comboBreakCount !== 0);
     }
+    checkAchievements();
 
     const min = Math.floor(state.survivedTime / 60).toString().padStart(2, "0");
     const sec = Math.floor(state.survivedTime % 60).toString().padStart(2, "0");
@@ -1053,6 +1130,7 @@ function closeRankingPage() {
 
 els.btnClassic.addEventListener("pointerdown", () => startGame("CLASSIC"));
 els.btnChallenge.addEventListener("pointerdown", () => startGame("CHALLENGE"));
+updateAchievementButton();
 els.btnAgain.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     startGame(state.currentGameMode);
