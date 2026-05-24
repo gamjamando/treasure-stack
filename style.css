@@ -22,8 +22,20 @@ html, body {
     touch-action: manipulation;
 }
 
+.hidden {
+    display: none !important;
+}
+
 .screen {
     height: 100dvh !important;
+}
+
+#start-screen {
+    background: #f8fafc;
+}
+
+#game-screen.hidden {
+    display: none !important;
 }
 
 /* 기본 상태 화이트 배경 */
