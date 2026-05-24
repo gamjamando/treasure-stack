@@ -164,24 +164,26 @@ html, body {
 }
 
 /* 고콤보 연출 */
-.tap-impact {
-    animation: tapImpact 0.06s ease-out;
-}
-
-@keyframes tapImpact {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.98); }
-    100% { transform: scale(1); }
-}
-
 .button-impact {
-    animation: buttonImpact 0.08s ease-out;
+    animation: buttonImpact 0.1s ease-out;
+}
+
+.screen-shake {
+    animation: screenShake var(--shake-duration, 110ms) ease-out;
 }
 
 @keyframes buttonImpact {
     0% { transform: scale(1); filter: brightness(1); }
-    50% { transform: scale(0.94); filter: brightness(1.15); }
+    50% { transform: scale(0.96); filter: brightness(1.12); }
     100% { transform: scale(1); filter: brightness(1); }
+}
+
+@keyframes screenShake {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(var(--shake-distance, 1px), 0); }
+    50% { transform: translate(calc(var(--shake-distance, 1px) * -1), 0); }
+    75% { transform: translate(calc(var(--shake-distance, 1px) * 0.5), 0); }
+    100% { transform: translate(0, 0); }
 }
 
 .combo-hot {
@@ -202,14 +204,10 @@ html, body {
 
 /* 오버로드 다단계 화면 흔들림 */
 .shake-low {
-    animation: pulseBg 1.5s infinite alternate;
+    animation: pulseBg 1.2s infinite alternate;
 }
 .shake-medium {
-    animation: shakeScreen 0.08s infinite, pulseBgFast 0.4s infinite alternate;
-}
-@keyframes shakeScreen {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    100% { transform: translate(-1px, -1px) rotate(0.5deg); }
+    animation: pulseBgFast 0.55s infinite alternate;
 }
 @keyframes pulseBg {
     0% { box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.2); }
@@ -218,6 +216,17 @@ html, body {
 @keyframes pulseBgFast {
     0% { box-shadow: inset 0 0 50px rgba(239, 68, 68, 0.4); }
     100% { box-shadow: inset 0 0 100px rgba(239, 68, 68, 0.8); }
+}
+
+.mistake-impact {
+    animation: mistakeImpact 0.12s ease-out;
+}
+
+@keyframes mistakeImpact {
+    0% { transform: translateX(0); }
+    35% { transform: translateX(1px); }
+    70% { transform: translateX(-1px); }
+    100% { transform: translateX(0); }
 }
 
 /* 피버 게이지 부르르 진동 */

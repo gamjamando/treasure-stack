@@ -49,6 +49,8 @@ let currentDropInterval = CHALLENGE_START_DROP_INTERVAL;
 let isResolvingInput = false;
 let breakingHeartIndex = null;
 let breakingHeartTimer = null;
+let screenShakeTimer = null;
+let overloadWarningStage = "NONE";
 
 let bestScoreClassic = parseInt(localStorage.getItem("ts_classic_best")) || 0;
 let bestScoreChallenge = parseInt(localStorage.getItem("ts_challenge_best")) || 0;
@@ -278,7 +280,7 @@ function clearFeverEffects() {
     els.combo.classList.remove("fever-ui-pulse");
     els.btnLeft.classList.remove("btn-fever-warning");
     els.btnRight.classList.remove("btn-fever-warning");
-    els.gameScreen.classList.remove("tap-impact");
+    els.gameScreen.classList.remove("screen-shake");
     els.rail.classList.remove("fever-hit");
 }
 
@@ -326,9 +328,31 @@ function restartAnimation(node, className) {
     node.classList.add(className);
 }
 
-function pulseInput(direction) {
-    restartAnimation(els.gameScreen, "tap-impact");
-    restartAnimation(direction === "L" ? els.btnLeft : els.btnRight, "button-impact");
+function triggerScreenShake(intensity = 1, duration = 110) {
+    const clampedIntensity = Math.max(0.5, Math.min(2.5, intensity));
+    const clampedDuration = Math.max(80, Math.min(150, duration));
+
+    if (screenShakeTimer) clearTimeout(screenShakeTimer);
+    els.gameScreen.style.setProperty("--shake-distance", `${clampedIntensity}px`);
+    els.gameScreen.style.setProperty("--shake-duration", `${clampedDuration}ms`);
+    restartAnimation(els.gameScreen, "screen-shake");
+
+    screenShakeTimer = setTimeout(() => {
+        els.gameScreen.classList.remove("screen-shake");
+        screenShakeTimer = null;
+    }, clampedDuration);
+}
+
+function playInputFeedback(direction, isCorrect, itemType) {
+    const targetButton = direction === "L" ? els.btnLeft : els.btnRight;
+    restartAnimation(targetButton, "button-impact");
+
+    if (isCorrect) {
+        bumpBelt(itemType === "BOMB" ? 22 : 10);
+    } else {
+        bumpBelt(24);
+        if (itemType === "BOMB") restartAnimation(els.rail, "mistake-impact");
+    }
 }
 
 function getComboLabel(combo) {
@@ -377,6 +401,7 @@ function triggerFeverIntro() {
     feverPop.textContent = "FEVER!!";
     els.floatLayer.appendChild(feverPop);
     restartAnimation(els.rail, "fever-hit");
+    triggerScreenShake(1.4, 120);
     setTimeout(() => feverPop.remove(), 700);
 }
 
@@ -396,6 +421,7 @@ function startGame(mode) {
     state.lives = 3;
     clearBreakingHeart();
     updateComboText();
+    overloadWarningStage = "NONE";
 
     itemDropTimer = 0;
     currentDropInterval = CHALLENGE_START_DROP_INTERVAL;
@@ -490,6 +516,8 @@ function renderStack() {
     els.warning.classList.add("hidden");
 
     if (state.currentGameMode === "CHALLENGE") {
+        let nextOverloadStage = "NONE";
+
         if (count >= OVERLOAD_LIMIT) {
             endGame("OVERLOAD");
             return;
@@ -497,10 +525,19 @@ function renderStack() {
         if (count >= OVERLOAD_WARN_HIGH) {
             els.warning.classList.remove("hidden");
             els.gameScreen.classList.add("shake-medium");
+            nextOverloadStage = "HIGH";
         } else if (count >= OVERLOAD_WARN_LOW) {
             els.warning.classList.remove("hidden");
             els.gameScreen.classList.add("shake-low");
+            nextOverloadStage = "LOW";
         }
+
+        if (nextOverloadStage !== "NONE" && nextOverloadStage !== overloadWarningStage) {
+            triggerScreenShake(nextOverloadStage === "HIGH" ? 1.5 : 1, 110);
+        }
+        overloadWarningStage = nextOverloadStage;
+    } else {
+        overloadWarningStage = "NONE";
     }
 
     updateFeverGauge();
@@ -598,8 +635,6 @@ function processInput(direction) {
     if (state.isGameOver || state.stack.length === 0) return;
     if (isResolvingInput) return;
 
-    pulseInput(direction);
-
     isResolvingInput = true;
     const wasFeverInput = state.isFever;
 
@@ -615,11 +650,11 @@ function processInput(direction) {
     }
 
     let triggeredFever = false;
+    playInputFeedback(direction, isCorrect, itemType);
 
     if (isCorrect) {
         handleCorrectInput(itemType, activeNode);
         showImpactBurst(activeNode, itemType, true);
-        bumpBelt(itemType === "BOMB" ? 22 : 10);
 
         if (!state.isFever) {
             state.feverGauge = Math.min(state.maxFeverGauge, state.feverGauge + 5);
@@ -639,7 +674,6 @@ function processInput(direction) {
     } else {
         handleWrongInput(itemType, activeNode);
         showImpactBurst(activeNode, itemType, false);
-        bumpBelt(24);
     }
 
     if (activeNode) activeNode.classList.add(direction === "L" ? "fly-left" : "fly-right");
@@ -697,6 +731,9 @@ function handleWrongInput(itemType, activeNode) {
     } else {
         state.lives--;
         showBreakingHeart(state.lives);
+    }
+    if (itemType === "BOMB" || state.currentGameMode === "CHALLENGE") {
+        triggerScreenShake(itemType === "BOMB" ? 1.8 : 1.2, itemType === "BOMB" ? 140 : 110);
     }
     updateComboText();
 
