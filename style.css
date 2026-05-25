@@ -63,6 +63,7 @@ html, body {
 }
 
 #track {
+    --rail-bottom-guard: clamp(1rem, 5%, 2.25rem);
     flex: 1 1 0 !important;
     min-height: 0;
     width: 100%;
@@ -383,35 +384,35 @@ html, body {
 ========================= */
 
 .pos-0 {
-    bottom: 3%;
+    bottom: 9%;
     transform: scale(1.24);
     z-index: 60;
     opacity: 1;
 }
 
 .pos-1 {
-    bottom: 18%;
+    bottom: 22%;
     transform: scale(1.06);
     z-index: 50;
     opacity: 1;
 }
 
 .pos-2 {
-    bottom: 32%;
+    bottom: 35%;
     transform: scale(0.91);
     z-index: 40;
     opacity: 1;
 }
 
 .pos-3 {
-    bottom: 45%;
+    bottom: 47%;
     transform: scale(0.78);
     z-index: 30;
     opacity: 1;
 }
 
 .pos-4 {
-    bottom: 57%;
+    bottom: 58%;
     transform: scale(0.66);
     z-index: 20;
     opacity: 1;
@@ -755,7 +756,7 @@ html, body {
 
 #belt-area {
     position: absolute;
-    inset: 0;
+    inset: 0 0 var(--rail-bottom-guard, 0px) 0;
 
     display: flex;
     justify-content: center;
@@ -768,7 +769,7 @@ html, body {
 
 .belt {
     width: 24vw;
-    height: 128%;
+    height: 300%;
 
     background-image: url("Assets/Background/belt.png");
     background-repeat: repeat-y;
@@ -813,7 +814,17 @@ html, body {
 }
 
 #item-stack {
+    position: absolute !important;
+    inset: 0 0 var(--rail-bottom-guard, 0px) 0;
+    width: 100%;
+    height: auto !important;
+    overflow: hidden;
+    pointer-events: none;
     z-index: 20;
+}
+
+#float-layer {
+    inset: 0 0 var(--rail-bottom-guard, 0px) 0;
 }
 
 #start-screen,
